@@ -1,7 +1,11 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
+
 plugins {
+    id("org.jetbrains.intellij.platform") version "2.1.0"
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.intellij") version "1.17.4"
+    id("org.jetbrains.kotlin.jvm") version "1.9.24"
+    id("org.jetbrains.compose") version "1.7.0"
 }
 
 group = "sirgl"
@@ -9,15 +13,38 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/kpm/public")
+    google()
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/kpm/public")
+        mavenCentral()
+        google()
+    }
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2023.2.6")
-    type.set("IC") // Target IDE Platform
+dependencies {
+    intellijPlatform {
+//        create(IntelliJPlatformType.IntellijIdeaUltimate, "2024.2")
+        intellijIdeaCommunity("2024.2")
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+//        jetbrainsRuntime()
+        pluginVerifier()
+        zipSigner()
+        instrumentationTools()
+        testFramework(TestFrameworkType.JUnit5)
+        testFramework(TestFrameworkType.Platform)
+    }
+
+    implementation(compose.desktop.currentOs) {
+//        exclude(group = "org.jetbrains.compose.material")
+        exclude(group = "org.jetbrains.kotlinx")
+        exclude(group = "org.jetbrains.kotlin")
+    }
 }
 
 tasks {
